@@ -1,50 +1,49 @@
 #include <iostream>
-#include<algorithm>
+#include <vector>
+#include <algorithm>
+#include <stdio.h>
 using namespace std;
-const int maxn = 1000 * 30 * 100;
-int max_value;
-int dp[maxn];
-int capacity;
-int val[maxn];
+
+bool cmp(int a, int b)
+{
+	return a > b;
+}
 
 int main()
 {
-	double v;
-	int n;
-	while (cin>>v>>n && n)
+	float Q; // 最大报销额
+	int N; // 发票张数
+	while (cin >> Q >> N && N != 0)
 	{
-		capacity = 0;
-		max_value = (int)(v * 100);
-		for (int i = 1;i <= n;i++)
+		int n; // 每张发票物品件数
+		vector<float> price; // 用于储存可以报销的发票的报销额
+		while (N--) // 每张发票
 		{
-			int num;
-			char type;
-			double va = 0, vb = 0, vc = 0;
-			scanf("%d", &num);
-			bool flag = true;
-			while (num--)
-			{
-				scanf(" %c:%lf", &type, &v);
-				if (type == 'A') va += v; 
-				else if (type == 'B') vb += v; 
-				else if (type == 'C') vc += v; 
-				else flag = false; 
+			cin >> n; 
+			float sum = 0, temp; // 每张发票报销总额，单件物品价值
+			bool flag = true; // 用于判断是否可以报销
+			while (n--)
+			{ 
+				getchar();
+				string str;
+				getline(cin, str, ':');
+				if (str != "A" && str != "B" && str != "C")
+					flag = false;
+				cin >> temp;
+				if (temp > 600) // 判断单件物品价值是否超过600元
+					flag = false;
+				sum += temp;
 			}
-			if (flag && va <= 600 && vb <= 600 && vc <= 600 && va + vb + vc <= 1000)
-			{
-				val[++capacity] = (int)((va + vb + vc) * 100);
-			}
+			if (sum <= 1000 && sum <= Q && flag == true)
+				price.push_back(sum);
 		}
-		for (int i = 0; i < maxn; i++)
-            dp[i] = 0;
-		for (int i = 1;i <= capacity;i++)
+		sort(price.begin(), price.end(), cmp); // 将满足条件的发票由大到小排序
+		float ans = 0; // 可以报销的最大数额
+		for (unsigned int i = 0; i < price.size(); i++)
 		{
-			for (int j = max_value;j >= val[i];j--)
-			{
-				dp[j] = max(dp[j], dp[j - val[i]] + val[i]);
-			}
-
+			if (ans + price[i] <= Q)
+				ans += price[i];
 		}
-		printf("%.2lf\n", (dp[max_value]) / 100.0);
+		printf("%.2f\n", ans);
 	}
 }
